@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Cwd ('abs_path');
+use File::Basename ('dirname');
+
+my $root = dirname(dirname(abs_path($0)));
+$root || die "No root?";
+#print "Root: $root\n";
+
+my @OK =
+(
+    '.',
+    '..',
+    '.git',
+    'amling',
+    'bin',
+    'lib',
+    'tests',
+    'todo',
+);
+my %OK = map { $_ => 1 } @OK;
+
+opendir(my $fh, $root) || die "Could not open $root: $!";
+while(my $l = readdir($fh))
+{
+    next if($OK{$l});
+    die "Bad: $l";
+}
+closedir($fh) || die "Could not close $root: $!";

@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Cwd ('abs_path');
+use File::Basename ('dirname');
+
+my $root = dirname(dirname(abs_path($0)));
+$root || die 'No root?';
+#print "Root: $root\n";
+
+my $image = "$root/amling/image";
+my @CMDS =
+(
+    ["$root/amling/check"],
+    ['rm', '-rf', '--', "$root/amling/image"],
+    ['mkdir', '-p', '--', "$image/bin"],
+    ['mkdir', '-p', '--', "$image/lib"],
+    ['rsync', '-av', '--progress', "$root/lib/", "$image/lib/"],
+    ['rsync', '-av', '--progress', "$root/bin/", "$image/bin/"],
+    ['sed', '-i', '1s@^#!perl$@#!/usr/bin/perl@', "$image/bin/recs", "$image/bin/recs-operation"],
+);
+
+for my $cmd (@CMDS)
+{
+    (system('env', @$cmd) == 0) || die 'Failed: ' . join(' ', @$cmd);
+}

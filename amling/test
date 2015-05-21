@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Cwd ('abs_path');
+use File::Basename ('dirname');
+use Test::Harness;
+
+my $root = dirname(dirname(abs_path($0)));
+$root || die 'No root?';
+#print "Root: $root\n";
+
+#!/usr/bin/env perl
+
+(system("$root/amling/check") == 0) || die 'Check failed';
+
+unshift @INC, "$root/lib";
+unshift @INC, "$root/tests";
+$ENV{'PATH'} = "$root/bin:" . ($ENV{'PATH'} || '');
+$ENV{'PERLLIB'} = "$root/lib:" . ($ENV{'PERLLIB'} || '');
+$ENV{'BASE_TEST_DIR'} = "$root/tests";
+
+runtests(@ARGV);
